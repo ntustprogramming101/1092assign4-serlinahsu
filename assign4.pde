@@ -30,6 +30,10 @@ final float PLAYER_INIT_Y = - SOIL_SIZE;
 boolean leftState = false;
 boolean rightState = false;
 boolean downState = false;
+int lifeX = 10;
+int lifeY = 10;
+int lifeWidth = 50;
+int lifeSpace = 20;
 int playerHealth = 2;
 final int PLAYER_MAX_HEALTH = 5;
 int playerMoveDirection = 0;
@@ -95,13 +99,64 @@ void setup() {
 		for (int j = 0; j < soilHealth[i].length; j++) {
 			 // 0: no soil, 15: soil only, 30: 1 stone, 45: 2 stones
 			soilHealth[i][j] = 15;
+      
+      //use function?
+      //floor 1-8
+      if(j>=0 && j<8){
+        if(i == j) soilHealth[i][j] = 30;
+      }
+      
+      //floor 9-16
+      if(j>=8 && j<16){
+        if((i%4==1 || i%4==2)&&(j%4==0||j%4==3)) 
+          soilHealth[i][j] = 30;
+        if((i%4==0 || i%4==3)&&(j%4==1||j%4==2))
+          soilHealth[i][j] = 30;
+      }
+      
+      //floor 17-24
+      if(j>=16 && j<24){
+        if(j%3==1){
+          if(i%3==1) soilHealth[i][j] = 30;
+          if(i%3==2) soilHealth[i][j] = 45;
+        }
+        if(j%3==2){
+          if(i%3==0) soilHealth[i][j] = 30;
+          if(i%3==1) soilHealth[i][j] = 45;
+        }
+        if(j%3==0){
+          if(i%3==2) soilHealth[i][j] = 30;
+          if(i%3==0) soilHealth[i][j] = 45;
+        }  
+      }
 		}
 	}
 
 	// Initialize soidiers and their position
-
+  soldierX = new float[6];
+  soldierY = new float[6];
+  for(int i = 0; i < soldierX.length; i++){
+    int x = (int)random(SOIL_COL_COUNT);
+    int y = (int)random(4);
+    soldierX[i] = x*SOIL_SIZE;
+    soldierY[i] = y*SOIL_SIZE + 4*i*SOIL_SIZE;
+  }    
 	// Initialize cabbages and their position
-
+  cabbageX = new float[6];
+  cabbageY = new float[6];
+  for(int i = 0; i < cabbageX.length; i++){
+    int x = (int)random(SOIL_COL_COUNT);
+    int y = (int)random(4);
+    cabbageX[i] = x*SOIL_SIZE;
+    cabbageY[i] = y*SOIL_SIZE + 4*i*SOIL_SIZE;
+  }
+  //random empty soil
+  for (int j = 1; j < SOIL_ROW_COUNT; j+=1) {
+    int emptySoil1 = (int)random(SOIL_COL_COUNT);
+    int emptySoil2 = (int)random(SOIL_COL_COUNT);
+    soilHealth[emptySoil1][j] = 0;
+    soilHealth[emptySoil2][j] = 0;
+  }      
 }
 
 void draw() {
@@ -159,23 +214,82 @@ void draw() {
 				// NOTE: To avoid errors on webpage, you can either use floor(j / 4) or (int)(j / 4) to make sure it's an integer.
 				int areaIndex = floor(j / 4);
 				image(soils[areaIndex][4], i * SOIL_SIZE, j * SOIL_SIZE);
-				
+        //show soil
+          if(soilHealth[i][j] > 0 && soilHealth[i][j] <= 3){
+            image(soils[areaIndex][0], i * SOIL_SIZE, j * SOIL_SIZE);
+          }else if(soilHealth[i][j] > 3 && soilHealth[i][j] <= 6){
+            image(soils[areaIndex][1], i * SOIL_SIZE, j * SOIL_SIZE);
+          }else if(soilHealth[i][j] > 6 && soilHealth[i][j] <= 9){
+            image(soils[areaIndex][2], i * SOIL_SIZE, j * SOIL_SIZE);
+          }else if(soilHealth[i][j] > 9 && soilHealth[i][j] <= 12){
+            image(soils[areaIndex][3], i * SOIL_SIZE, j * SOIL_SIZE);
+          }else if(soilHealth[i][j] > 12 && soilHealth[i][j] <= 45){
+            image(soils[areaIndex][4], i * SOIL_SIZE, j * SOIL_SIZE);
+          }
+          
+          //show stone 0
+          if(soilHealth[i][j] >= 16 && soilHealth[i][j] <= 18){
+            image(stones[0][0], i * SOIL_SIZE, j * SOIL_SIZE);
+          }else if(soilHealth[i][j] > 18 && soilHealth[i][j] <= 21){
+            image(stones[0][1], i * SOIL_SIZE, j * SOIL_SIZE);
+          }else if(soilHealth[i][j] > 21 && soilHealth[i][j] <= 24){
+            image(stones[0][2], i * SOIL_SIZE, j * SOIL_SIZE);
+          }else if(soilHealth[i][j] > 24 && soilHealth[i][j] <= 27){
+            image(stones[0][3], i * SOIL_SIZE, j * SOIL_SIZE);
+          }else if(soilHealth[i][j] > 27 && soilHealth[i][j] <= 45){
+            image(stones[0][4], i * SOIL_SIZE, j * SOIL_SIZE);
+          }
+          //show stone 1
+          if(soilHealth[i][j] >= 31 && soilHealth[i][j] <= 33){
+            image(stones[1][0], i * SOIL_SIZE, j * SOIL_SIZE);
+          }else if(soilHealth[i][j] > 33 && soilHealth[i][j] <= 36){
+            image(stones[1][1], i * SOIL_SIZE, j * SOIL_SIZE);
+          }else if(soilHealth[i][j] > 36 && soilHealth[i][j] <= 39){
+            image(stones[1][2], i * SOIL_SIZE, j * SOIL_SIZE);
+          }else if(soilHealth[i][j] > 39 && soilHealth[i][j] <= 42){
+            image(stones[1][3], i * SOIL_SIZE, j * SOIL_SIZE);
+          }else if(soilHealth[i][j] > 42 && soilHealth[i][j] <= 45){
+            image(stones[1][4], i * SOIL_SIZE, j * SOIL_SIZE);
+          }
+          
+          //empty
+          if(soilHealth[i][j] == 0){
+            image(soilEmpty, i * SOIL_SIZE, j * SOIL_SIZE);
+          }
+        }		
 			}
-		}
+		
 
 		// Cabbages
 		// > Remember to check if playerHealth is smaller than PLAYER_MAX_HEALTH!
-
+    for(int i = 0; i < cabbageX.length; i++){
+      if(playerX == cabbageX[i] && playerY == cabbageY[i]){
+        if(playerHealth < PLAYER_MAX_HEALTH){
+          cabbageX[i] = -80;
+          playerHealth +=1;
+        }else{
+          image(cabbage, cabbageX[i], cabbageY[i]);
+        }
+      }
+    }
 		// Groundhog
 
 		PImage groundhogDisplay = groundhogIdle;
 
 		// If player is not moving, we have to decide what player has to do next
 		if(playerMoveTimer == 0){
+      
+      if(playerRow < SOIL_ROW_COUNT-1){
+        if(soilHealth[playerCol][playerRow+1] == 0){
+        groundhogDisplay = groundhogDown;
+        playerMoveDirection = DOWN;
+        playerMoveTimer = playerMoveDuration;
+        }
+      }
 
 			// HINT:
 			// You can use playerCol and playerRow to get which soil player is currently on
-
+      
 			// Check if "player is NOT at the bottom AND the soil under the player is empty"
 			// > If so, then force moving down by setting playerMoveDirection and playerMoveTimer (see downState part below for example)
 			// > Else then determine player's action based on input state
@@ -186,15 +300,20 @@ void draw() {
 
 				// Check left boundary
 				if(playerCol > 0){
+          
 
 					// HINT:
 					// Check if "player is NOT above the ground AND there's soil on the left"
 					// > If so, dig it and decrease its health
 					// > Else then start moving (set playerMoveDirection and playerMoveTimer)
-
-					playerMoveDirection = LEFT;
-					playerMoveTimer = playerMoveDuration;
-
+          if(playerRow >= 0){
+            if(soilHealth[playerCol-1][playerRow] == 0){ // no soil on the left
+              playerMoveDirection = LEFT;
+              playerMoveTimer = playerMoveDuration;
+            }else{ //soil on the left 
+              soilHealth[playerCol-1][playerRow] -=1;
+            }
+          }
 				}
 
 			}else if(rightState){
@@ -208,10 +327,14 @@ void draw() {
 					// Check if "player is NOT above the ground AND there's soil on the right"
 					// > If so, dig it and decrease its health
 					// > Else then start moving (set playerMoveDirection and playerMoveTimer)
-
-					playerMoveDirection = RIGHT;
-					playerMoveTimer = playerMoveDuration;
-
+          if(playerRow >= 0){
+            if(soilHealth[playerCol+1][playerRow] == 0){ // no soil on the right
+              playerMoveDirection = RIGHT;
+              playerMoveTimer = playerMoveDuration;
+            }else{
+              soilHealth[playerCol+1][playerRow] -=1;
+            }
+          }
 				}
 
 			}else if(downState){
@@ -231,10 +354,12 @@ void draw() {
 					// For requirement #3:
 					// Note that player never needs to move down as it will always fall automatically,
 					// so the following 2 lines can be removed once you finish requirement #3
-
-					playerMoveDirection = DOWN;
-					playerMoveTimer = playerMoveDuration;
-
+          if(soilHealth[playerCol][playerRow+1] == 0){ // no soil on the bottom
+              playerMoveDirection = DOWN;
+              playerMoveTimer = playerMoveDuration;
+           }else{
+              soilHealth[playerCol][playerRow+1] -=1;
+           }
 
 				}
 			}
@@ -289,7 +414,26 @@ void draw() {
 		// > Remember to stop player's moving! (reset playerMoveTimer)
 		// > Remember to recalculate playerCol/playerRow when you reset playerX/playerY!
 		// > Remember to reset the soil under player's original position!
-
+     for(int i = 0; i < soldierX.length; i++){
+       soldierX[i] += soldierSpeed;
+       if(soldierX[i] >= width) soldierX[i] = -80;
+       image(soldier, soldierX[i], soldierY[i]);
+        if(playerX == soldierX[i] && playerY == soldierY[i]){
+          if(playerHealth < PLAYER_MAX_HEALTH){
+            
+           playerHealth -=1;
+           playerX = PLAYER_INIT_X;
+           playerY = PLAYER_INIT_Y;
+           playerCol = (int) (playerX / SOIL_SIZE);
+           playerRow = (int) (playerY / SOIL_SIZE);
+           
+           
+          }else{
+            image(cabbage, cabbageX[i], cabbageY[i]);
+          }
+        }
+    }
+    
 		// Demo mode: Show the value of soilHealth on each soil
 		// (DO NOT CHANGE THE CODE HERE!)
 
@@ -310,7 +454,15 @@ void draw() {
 		popMatrix();
 
 		// Health UI
-
+    for (int i = 0; i<playerHealth; i++){
+      if(i < PLAYER_MAX_HEALTH){ 
+        image(life, lifeX+(lifeWidth + lifeSpace)*i, lifeY);
+      }
+    }
+    
+    if(playerHealth == 0){
+      gameState = GAME_OVER;
+    }
 		break;
 
 		case GAME_OVER: // Gameover Screen
@@ -334,6 +486,45 @@ void draw() {
 				playerMoveTimer = 0;
 				playerHealth = 2;
 
+        //initilize soil
+        soilHealth = new int[SOIL_COL_COUNT][SOIL_ROW_COUNT];
+        for(int i = 0; i < soilHealth.length; i++){
+          for (int j = 0; j < soilHealth[i].length; j++) {
+             // 0: no soil, 15: soil only, 30: 1 stone, 45: 2 stones
+            soilHealth[i][j] = 15;
+            
+            //use function?
+            //floor 1-8
+            if(j>=0 && j<8){
+              if(i == j) soilHealth[i][j] = 30;
+            }
+            
+            //floor 9-16
+            if(j>=8 && j<16){
+              if((i%4==1 || i%4==2)&&(j%4==0||j%4==3)) 
+                soilHealth[i][j] = 30;
+              if((i%4==0 || i%4==3)&&(j%4==1||j%4==2))
+                soilHealth[i][j] = 30;
+            }
+            
+            //floor 17-24
+            if(j>=16 && j<24){
+              if(j%3==1){
+                if(i%3==1) soilHealth[i][j] = 30;
+                if(i%3==2) soilHealth[i][j] = 45;
+              }
+              if(j%3==2){
+                if(i%3==0) soilHealth[i][j] = 30;
+                if(i%3==1) soilHealth[i][j] = 45;
+              }
+              if(j%3==0){
+                if(i%3==2) soilHealth[i][j] = 30;
+                if(i%3==0) soilHealth[i][j] = 45;
+              }  
+            }
+          }
+        }
+
 				// Initialize soilHealth
 				soilHealth = new int[SOIL_COL_COUNT][SOIL_ROW_COUNT];
 				for(int i = 0; i < soilHealth.length; i++){
@@ -344,9 +535,26 @@ void draw() {
 				}
 
 				// Initialize soidiers and their position
-
+        for(int i = 0; i < soldierX.length; i++){
+          int x = (int)random(SOIL_COL_COUNT);
+          int y = (int)random(4);
+          soldierX[i] = x*SOIL_SIZE;
+          soldierY[i] = y*SOIL_SIZE + 4*i*SOIL_SIZE;
+        }
 				// Initialize cabbages and their position
-				
+				for(int i = 0; i < cabbageX.length; i++){
+          int x = (int)random(SOIL_COL_COUNT);
+          int y = (int)random(4);
+          cabbageX[i] = x*SOIL_SIZE;
+          cabbageY[i] = y*SOIL_SIZE + 4*i*SOIL_SIZE;
+        }
+        //random empty soil
+         for (int j = 1; j < SOIL_ROW_COUNT; j+=1) {
+          int emptySoil1 = (int)random(SOIL_COL_COUNT);
+          int emptySoil2 = (int)random(SOIL_COL_COUNT);
+          soilHealth[emptySoil1][j] = 0;
+          soilHealth[emptySoil2][j] = 0;
+        }
 			}
 
 		}else{
