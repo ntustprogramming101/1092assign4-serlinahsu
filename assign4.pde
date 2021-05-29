@@ -263,14 +263,16 @@ void draw() {
 		// Cabbages
 		// > Remember to check if playerHealth is smaller than PLAYER_MAX_HEALTH!
     for(int i = 0; i < cabbageX.length; i++){
-      if(playerX == cabbageX[i] && playerY == cabbageY[i]){
+      if(playerX < cabbageX[i] + cabbage.width
+         && playerX + cabbage.width > cabbageX[i]
+         && playerY < cabbageY[i] + cabbage.width
+         && playerY + cabbage.width > cabbageY[i]){
         if(playerHealth < PLAYER_MAX_HEALTH){
           cabbageX[i] = -80;
           playerHealth +=1;
-        }else{
-          image(cabbage, cabbageX[i], cabbageY[i]);
         }
       }
+      image(cabbage, cabbageX[i], cabbageY[i]);
     }
 		// Groundhog
 
@@ -293,7 +295,7 @@ void draw() {
 			// Check if "player is NOT at the bottom AND the soil under the player is empty"
 			// > If so, then force moving down by setting playerMoveDirection and playerMoveTimer (see downState part below for example)
 			// > Else then determine player's action based on input state
-
+/*
 			if(leftState){
 
 				groundhogDisplay = groundhogLeft;
@@ -315,27 +317,44 @@ void draw() {
             }
           }
 				}
+*/
+if(leftState){
 
+        groundhogDisplay = groundhogLeft;
+
+        // Check left boundary
+        if(playerCol > 0){
+          //Check if "player is NOT above the ground AND there's soil on the left"
+          if(playerRow >= 0 && soilHealth[playerCol - 1][playerRow] > 0){
+            //dig(decrease soilHealth)
+            constrain(soilHealth[playerCol-1][playerRow], 0, 45);
+            soilHealth[playerCol-1][playerRow]--;
+          }else{
+            //if the dig is done then keep moving left
+            playerMoveDirection = LEFT;
+            playerMoveTimer = playerMoveDuration;
+          }
+        }
+        
 			}else if(rightState){
 
-				groundhogDisplay = groundhogRight;
+        groundhogDisplay = groundhogRight;
 
-				// Check right boundary
-				if(playerCol < SOIL_COL_COUNT - 1){
-
-					// HINT:
-					// Check if "player is NOT above the ground AND there's soil on the right"
-					// > If so, dig it and decrease its health
-					// > Else then start moving (set playerMoveDirection and playerMoveTimer)
-          if(playerRow >= 0){
-            if(soilHealth[playerCol+1][playerRow] == 0){ // no soil on the right
-              playerMoveDirection = RIGHT;
-              playerMoveTimer = playerMoveDuration;
-            }else{
-              soilHealth[playerCol+1][playerRow] -=1;
-            }
+        // Check right boundary
+        if(playerCol < SOIL_COL_COUNT - 1){
+  
+          //Check if "player is NOT above the ground AND there's soil on the right"
+          if(playerRow >= 0 && soilHealth[playerCol + 1][playerRow] > 0){
+            //dig(decrease soilHealth)
+            constrain(soilHealth[playerCol + 1][playerRow], 0, 45);
+            soilHealth[playerCol + 1][playerRow] --;
+            
+          }else{
+            //if the dig is done then keep moving left
+            playerMoveDirection = RIGHT;
+            playerMoveTimer = playerMoveDuration;            
           }
-				}
+        }
 
 			}else if(downState){
 
@@ -418,7 +437,11 @@ void draw() {
        soldierX[i] += soldierSpeed;
        if(soldierX[i] >= width) soldierX[i] = -80;
        image(soldier, soldierX[i], soldierY[i]);
-        if(playerX == soldierX[i] && playerY == soldierY[i]){
+       
+        if(playerX < soldierX[i] + soldier.width
+         && playerX + groundhogIdle.width > soldierX[i]
+         && playerY < soldierY[i] + soldier.width
+         && playerY + groundhogIdle.width > soldierY[i]){
           if(playerHealth < PLAYER_MAX_HEALTH){
             
            playerHealth -=1;
@@ -426,6 +449,8 @@ void draw() {
            playerY = PLAYER_INIT_Y;
            playerCol = (int) (playerX / SOIL_SIZE);
            playerRow = (int) (playerY / SOIL_SIZE);
+           soilHealth[4][0] = 15;
+           playerMoveTimer = 0;
            
            
           }else{
